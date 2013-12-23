@@ -7,6 +7,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Persistent storage of queued transfers and results
  */
@@ -38,6 +41,39 @@ public class BrigandDB extends SQLiteOpenHelper {
         columnIndex = c.getColumnIndex("startTime");
         result.startedTime = c.getLong(columnIndex);
         return result;
+    }
+
+    public QueuedTransfer getNextTransfer() {
+        SQLiteDatabase db = getWritableDatabase();
+        assert db != null;
+        try {
+            Cursor c = db.query("queuedTransfers", null, null, null, null, null, "startTime ASC", "1");
+            if (c.getCount() == 0) {
+                return null;
+            }
+            c.moveToFirst();
+            QueuedTransfer result = readQueuedTransferFromCursor(c);
+            // delete the transfer from the db after
+            db.delete("queuedTransfers", "_id = ?", new String[] { String.valueOf(result.id) });
+            return result;
+        } finally {
+            db.close();
+        }
+    }
+
+    /**
+     * @return the number of queued transfers
+     */
+    public int getQueueSize() {
+        SQLiteDatabase db = getReadableDatabase();
+        assert db != null;
+        try {
+            Cursor c = db.rawQuery("SELECT COUNT(*) FROM queuedTransfers", null);
+            c.moveToFirst();
+            return c.getInt(0);
+        } finally {
+            db.close();
+        }
     }
 
     private static final int VERSION = 1;

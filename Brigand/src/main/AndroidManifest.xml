@@ -1,12 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.getout.brigand"
     android:versionCode="1"
-    android:versionName="1.0">
+    android:versionName="1.0" >
 
-    <uses-sdk android:minSdkVersion="7" android:targetSdkVersion="18" />
+    <uses-sdk
+        android:minSdkVersion="7"
+        android:targetSdkVersion="18" />
 
     <application>
-        <service android:name=".BrigandService" />
+        <service android:name="com.getout.brigand.BrigandService" />
+
+        <receiver
+            android:name="com.getout.brigand.BrigandReceiver"
+            android:enabled="true"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
+                <action android:name="android.intent.action.BATTERY_OKAY" />
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

@@ -30,6 +30,7 @@ public class QueuedTransfer {
     public static class TransferResult {
         public boolean errorInRequest = false;
         public boolean errorInTransfer = false;
+        public String errorMessage = null;
         public int code = -1;
         public String body = null;
     }
@@ -49,6 +50,7 @@ public class QueuedTransfer {
             return result;
         } catch (IOException e) {
             result.errorInTransfer = true;
+            result.errorMessage = e.getMessage();
             return result;
         }
     }

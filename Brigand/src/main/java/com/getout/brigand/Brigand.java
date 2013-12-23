@@ -30,14 +30,13 @@ public class Brigand {
         httpWithoutResult("GET", endpoint);
     }
 
-    private void httpWithoutResult(String verb, String endpoint) {
-        String packageName = context.getPackageName();
+    private void httpWithoutResult(String verb, String url) {
         // get brigand service, and transmit the request
         Intent i = new Intent();
-        i.setAction(packageName + ".QUEUE");
+        i.setAction("com.getout.brigand.QUEUE");
         i.setClass(context.getApplicationContext(), BrigandService.class);
-        i.putExtra(packageName + ".endpoint", endpoint);
-        i.putExtra(packageName + ".verb", verb);
+        i.putExtra("com.getout.brigand.url", url);
+        i.putExtra("com.getout.brigand.verb", verb);
         context.startService(i);
     }
 
