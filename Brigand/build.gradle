@@ -22,5 +22,97 @@ android {
     }
 }
 
-dependencies {
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+version = "1.0.0"
+group = "com.getout-tlv.brigand"
+
+configurations {
+    archives {
+        extendsFrom configurations.default
+    }
+}
+
+def nexusRepo
+if (has("release")) {
+    println 'RELEASE BUILD'
+    nexusRepo = nexusStageRepo
+} else {
+    println 'DEBUG BUILD'
+    nexusRepo = nexusSnapshotRepo
+}
+
+if(!hasProperty('nexusPassword')) {
+    ext.set('nexusPassword', System.console().readPassword("\n\$ Type in password for Sonatype nexus account " + nexusUsername + ": "))
+}
+
+afterEvaluate { project ->
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+                repository(url: nexusRepo) {
+                    authentication(userName: nexusUsername, password: nexusPassword)
+                }
+
+                pom.artifactId = 'Brigand'
+
+                pom.project {
+
+                    packaging 'aar'
+                    name 'Brigand'
+                    description 'Opportunistic bastard of communication libraries'
+                    url 'https://stevenkaras.github.io/brigand'
+
+                    scm {
+                        url 'scm:git@github.com:stevenkaras/brigand.git'
+                        connection 'scm:git@github.com:stevenkaras/brigand.git'
+                        developerConnection 'scm:git@github.com:stevenkaras/brigand.git'
+                    }
+
+                    licenses {
+                        license {
+                            name 'MIT Licence'
+                            url 'http://opensource.org/licenses/MIT'
+                            distribution 'repo'
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id 'stevenkaras'
+                            name 'Steven Karas'
+                            email 'steven.karas@gmail.com'
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    signing {
+        required { has("release") && gradle.taskGraph.hasTask("uploadArchives") }
+        sign configurations.archives
+    }
+
+    task androidJavadocs(type: Javadoc) {
+        source = android.sourceSets.main.allJava
+    }
+
+    task androidJavadocsJar(type: Jar) {
+        classifier = 'javadoc'
+        from androidJavadocs.destinationDir
+    }
+
+    task androidSourcesJar(type: Jar) {
+        classifier = 'sources'
+        from android.sourceSets.main.allSource
+    }
+
+    artifacts {
+        archives androidSourcesJar
+        archives androidJavadocsJar
+    }
 }
