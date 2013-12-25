@@ -26,11 +26,12 @@ public class BrigandService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        if (intent.getAction().equals("com.getout.brigand.QUEUE")) {
+        if ("com.getout.brigand.QUEUE".equals(intent.getAction())) {
             long time = System.currentTimeMillis();
             String verb = intent.getStringExtra("com.getout.brigand.verb");
             String url = intent.getStringExtra("com.getout.brigand.url");
-            db.scheduleTransfer(new QueuedTransfer(url, verb, time));
+            String payload = intent.getStringExtra("com.getout.brigand.payload");
+            db.scheduleTransfer(new QueuedTransfer(url, verb, payload, time));
         }
         executeQueuedTransfers();
     }

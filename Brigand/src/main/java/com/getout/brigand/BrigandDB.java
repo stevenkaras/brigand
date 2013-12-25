@@ -22,6 +22,7 @@ public class BrigandDB extends SQLiteOpenHelper {
             ContentValues values = new ContentValues();
             values.put("url", transfer.url);
             values.put("verb", transfer.verb);
+            values.put("payload", transfer.payload);
             values.put("startTime", transfer.startedTime);
             db.insert("queuedTransfers", null, values);
         } finally {
@@ -40,6 +41,8 @@ public class BrigandDB extends SQLiteOpenHelper {
         result.verb = c.getString(columnIndex);
         columnIndex = c.getColumnIndex("startTime");
         result.startedTime = c.getLong(columnIndex);
+        columnIndex = c.getColumnIndex("payload");
+        result.payload = c.getString(columnIndex);
         return result;
     }
 
@@ -76,7 +79,7 @@ public class BrigandDB extends SQLiteOpenHelper {
         }
     }
 
-    private static final int VERSION = 1;
+    private static final int VERSION = 2;
 
     public BrigandDB(Context context) {
         super(context, "brigand", null, VERSION);
@@ -98,6 +101,10 @@ public class BrigandDB extends SQLiteOpenHelper {
                     "verb TEXT," +
                     "startTime INTEGER" +
                     ")");
+        }
+        if (to < 2) return;
+        if (from < 2) {
+            db.execSQL("ALTER TABLE queuedTransfers ADD COLUMN payload TEXT");
         }
         if (to > 1) throw new RuntimeException("unrecognized BrigandDB version");
     }
