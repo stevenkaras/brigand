@@ -34,26 +34,17 @@ configurations {
     }
 }
 
-def nexusRepo
-if (has("release")) {
-    println 'RELEASE BUILD'
-    nexusRepo = nexusStageRepo
-} else {
-    println 'DEBUG BUILD'
-    nexusRepo = nexusSnapshotRepo
-}
-
-if(!hasProperty('nexusPassword')) {
-    ext.set('nexusPassword', System.console().readPassword("\n\$ Type in password for Sonatype nexus account " + nexusUsername + ": "))
-}
-
 afterEvaluate { project ->
     uploadArchives {
         repositories {
             mavenDeployer {
                 beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-                repository(url: nexusRepo) {
+                repository(url: nexusStageRepo) {
+                    authentication(userName: nexusUsername, password: nexusPassword)
+                }
+
+                snapshotRepository(url: nexusSnapshotRepo) {
                     authentication(userName: nexusUsername, password: nexusPassword)
                 }
 
