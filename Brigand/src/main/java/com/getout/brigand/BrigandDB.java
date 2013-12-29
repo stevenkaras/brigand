@@ -106,6 +106,6 @@ public class BrigandDB extends SQLiteOpenHelper {
         if (from < 2) {
             db.execSQL("ALTER TABLE queuedTransfers ADD COLUMN payload TEXT");
         }
-        if (to > 1) throw new RuntimeException("unrecognized BrigandDB version");
+        if (to > 2) throw new RuntimeException("unrecognized BrigandDB version");
     }
 }
