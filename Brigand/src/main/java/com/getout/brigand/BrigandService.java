@@ -69,7 +69,7 @@ public class BrigandService extends IntentService {
         long elapsedPeriods = ((System.currentTimeMillis() / 1000) - lastPump) / (30 * 60);
         if (elapsedPeriods == 0) return true; // never transfer in the first 30 minutes
         // otherwise, adjust the cost based on how long we've been waiting
-        cost /= 2 << elapsedPeriods;
+        cost = cost >> elapsedPeriods;
 
         // cost cannot be below 50
         cost = cost < 50 ? 50 : cost;
